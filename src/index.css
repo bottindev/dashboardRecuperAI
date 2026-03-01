@@ -1,0 +1,21 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  background: #0b0e11;
+}
+
+#root {
+  min-height: 100%;
+}
+
+button {
+  font-family: inherit;
+}
