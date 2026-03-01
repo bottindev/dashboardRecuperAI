@@ -1,5 +1,7 @@
+import { next } from "@vercel/edge";
+
 export const config = {
-  matcher: ["/((?!_vercel|favicon\\.ico).*)"],
+  matcher: ["/((?!_vercel|favicon.ico).*)"],
 };
 
 export default function middleware(request) {
@@ -22,7 +24,7 @@ export default function middleware(request) {
         user === expectedUser &&
         pass === expectedPass
       ) {
-        return;
+        return next(); // pass-through para a origem (Vercel Edge requer next())
       }
     } catch {
       // header malformado — cai no 401 abaixo
