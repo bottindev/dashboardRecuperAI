@@ -72,6 +72,11 @@ export default function RecuperAIDashboard() {
         ? ((totalConversations - prevConversations) / prevConversations) * 100
         : undefined;
 
+    const savedHours = Math.round((totalConversations * 15) / 60);
+    const botPercentage = latest.length > 0
+      ? Math.round(sum(latest, "bot_percentage") / latest.length)
+      : 0;
+
     return {
       totalRecovered,
       totalInvestment,
@@ -85,6 +90,8 @@ export default function RecuperAIDashboard() {
       latestMonth,
       trendRecovered,
       trendConversations,
+      savedHours,
+      botPercentage,
     };
   }, [filtered]);
 
@@ -342,6 +349,22 @@ export default function RecuperAIDashboard() {
             value={fmtInt(totals.totalCancelled)}
             color={COLORS.red}
             sublabel="Leads cancelados"
+          />
+          <MetricCard
+            icon="⏱️"
+            label="Tempo Economizado"
+            value={fmtInt(totals.savedHours)}
+            suffix="h"
+            color={COLORS.blue}
+            sublabel="Tempo economizado pelo bot"
+          />
+          <MetricCard
+            icon="🤖"
+            label="Bot vs Humano"
+            value={fmtInt(totals.botPercentage)}
+            suffix="%"
+            color={totals.botPercentage >= 80 ? COLORS.accent : COLORS.orange}
+            sublabel="Agendamentos feitos pelo bot"
           />
         </div>
 
