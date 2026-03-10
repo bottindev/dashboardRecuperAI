@@ -10,6 +10,12 @@ const NUMERIC_METRIC_FIELDS = [
   "roi_percent",
   "conversion_rate",
   "avg_ticket",
+  "total_appointments",
+  "bot_appointments",
+  "cancelled_appointments",
+  "delegated_conversations",
+  "tempo_economizado_min",
+  "bot_percentage",
 ];
 
 function isValidClient(item) {
