@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { AreaChart, Area, ResponsiveContainer } from "recharts";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +22,7 @@ export function KpiCard({
   chartData,
   style,
 }) {
+  const gradientId = useId();
   const c = colorMap[color] || colorMap.sky;
 
   return (
@@ -62,7 +64,7 @@ export function KpiCard({
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData}>
               <defs>
-                <linearGradient id={`spark-${color}`} x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor={c.fill} stopOpacity={0.15} />
                   <stop offset="100%" stopColor={c.fill} stopOpacity={0} />
                 </linearGradient>
@@ -72,7 +74,7 @@ export function KpiCard({
                 dataKey="v"
                 stroke={c.fill}
                 strokeWidth={1.5}
-                fill={`url(#spark-${color})`}
+                fill={`url(#${gradientId})`}
                 dot={false}
                 isAnimationActive={false}
               />
