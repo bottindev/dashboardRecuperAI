@@ -1,5 +1,6 @@
 import { useLocation } from "react-router-dom";
-import { Menu } from "lucide-react";
+import { Menu, LogOut } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const pageTitles = {
   "/": "Home",
@@ -10,6 +11,7 @@ const pageTitles = {
 
 export function Topbar({ onMenuClick, children }) {
   const { pathname } = useLocation();
+  const { signOut } = useAuth();
   const title = pageTitles[pathname] || (pathname.startsWith("/clientes/") ? "Cliente" : "Home");
 
   return (
@@ -24,7 +26,16 @@ export function Topbar({ onMenuClick, children }) {
         </button>
         <h1 className="text-lg font-semibold text-foreground">{title}</h1>
       </div>
-      <div className="flex items-center gap-2">{children}</div>
+      <div className="flex items-center gap-2">
+        {children}
+        <button
+          onClick={signOut}
+          title="Sair"
+          className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
+        >
+          <LogOut className="h-4 w-4" />
+        </button>
+      </div>
     </header>
   );
 }
