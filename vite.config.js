@@ -18,7 +18,7 @@ export default defineConfig({
         manualChunks: {
           recharts: ["recharts"],
           "react-vendor": ["react", "react-dom", "react-router-dom"],
-          xlsx: ["xlsx"],
+          exceljs: ["exceljs"],
         },
       },
     },
