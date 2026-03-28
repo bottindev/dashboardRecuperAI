@@ -5,6 +5,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  Legend,
   ResponsiveContainer,
 } from "recharts";
 import { fmtMonth, fmt } from "@/utils/formatters";
@@ -18,7 +19,7 @@ export function CompanyTrendChart({ data }) {
   return (
     <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
       <h3 className="mb-4 text-sm font-medium text-foreground">
-        Tendencia Mensal — Empresa
+        Receita &amp; Lucro
       </h3>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
@@ -53,7 +54,7 @@ export function CompanyTrendChart({ data }) {
                 borderRadius: "8px",
                 fontSize: "12px",
               }}
-              formatter={(value) => [`R$ ${fmt(value)}`]}
+              formatter={(value, name) => [`R$ ${fmt(value)}`, name]}
             />
             <Area
               type="monotone"
@@ -70,6 +71,15 @@ export function CompanyTrendChart({ data }) {
               stroke="#0EA5E9"
               strokeWidth={2}
               fill="url(#gLucroCompany)"
+            />
+            <Legend
+              verticalAlign="bottom"
+              height={36}
+              iconType="circle"
+              iconSize={8}
+              formatter={(value) => (
+                <span className="text-xs text-muted-foreground">{value}</span>
+              )}
             />
           </AreaChart>
         </ResponsiveContainer>
