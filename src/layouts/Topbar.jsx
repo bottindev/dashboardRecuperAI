@@ -1,6 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { Menu, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { AlertBell } from "@/components/alerts/AlertBell";
 
 const pageTitles = {
   "/": "Home",
@@ -27,6 +28,7 @@ export function Topbar({ onMenuClick, children }) {
         <h1 className="text-lg font-semibold text-foreground">{title}</h1>
       </div>
       <div className="flex items-center gap-2">
+        <AlertBell />
         {children}
         <button
           onClick={signOut}
