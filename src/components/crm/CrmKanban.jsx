@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -16,10 +16,11 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import { Calendar, Flame, Coffee, UserX } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { usePipelineData } from "@/hooks/queries/usePipelineData";
+import { useMovePipelineLead } from "@/hooks/mutations/useMovePipelineLead";
 
 // --- Configuração das Colunas ---
 // TODO Phase 2+: Follow Up badge/tag on lead cards (not a column)
@@ -110,7 +111,7 @@ function KanbanColumn({ column, leads }) {
           </span>
         </div>
       </div>
-      
+
       <div
         ref={setNodeRef}
         className="flex flex-1 flex-col gap-2 rounded-b-lg border border-white/5 bg-black/20 p-2 min-h-[500px]"
@@ -130,71 +131,16 @@ function KanbanColumn({ column, leads }) {
 
 // --- Principal: Board ---
 export function CrmKanban() {
-  const [leads, setLeads] = useState([]);
+  const { data: leads = [], isPending } = usePipelineData();
+  const moveLead = useMovePipelineLead();
+
   const [activeLead, setActiveLead] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   // Sensores do DnD Kit
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
-
-  // Carregar dados
-  useEffect(() => {
-    fetchPipeline();
-
-    // Assinar mudanças na tabela pipeline
-    const channel = supabase
-      .channel('public:recuperai_pipeline')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'recuperai_pipeline' }, () => {
-        fetchPipeline();
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
-
-  async function fetchPipeline() {
-    try {
-      setLoading(true);
-      // Busca a pipeline juntando com a tabela leads
-      const { data, error } = await supabase
-        .from('recuperai_pipeline')
-        .select(`
-          etapa,
-          lead_id,
-          recuperai_leads (
-            id,
-            nome,
-            telefone,
-            nome_negocio,
-            bant_total_score,
-            lead_tier,
-            call_agendada_at
-          )
-        `)
-        .in('etapa', ['novo', 'call_agendada', 'proposta', 'onboarding', 'ativo'])
-        .order('atualizado_em', { ascending: false });
-
-      if (error) throw error;
-
-      // Achata o payload
-      const formatted = data.map(row => ({
-        ...row.recuperai_leads,
-        etapa: row.etapa || 'novo' // default fallback
-      })).filter(l => l.id); // filtra nulls caso falte joined auth
-
-      setLeads(formatted);
-    } catch (err) {
-      console.error(err);
-      toast.error('Erro ao carregar pipeline. A migration já foi aplicada?');
-    } finally {
-      setLoading(false);
-    }
-  }
 
   // Handle Drag Events
   function handleDragStart(event) {
@@ -203,7 +149,7 @@ export function CrmKanban() {
     }
   }
 
-  async function handleDragEnd(event) {
+  function handleDragEnd(event) {
     const { active, over } = event;
     if (!over) return;
 
@@ -227,28 +173,19 @@ export function CrmKanban() {
     }
 
     if (activeLeadData.etapa !== targetColumnId) {
-      // Optimização Otimista Locamente
-      setLeads((prev) => 
-        prev.map(l => l.id === activeId ? { ...l, etapa: targetColumnId } : l)
+      moveLead.mutate(
+        { leadId: activeLeadData.id, newEtapa: targetColumnId },
+        {
+          onError: () => {
+            toast.error("Erro ao mover lead. Revise se ja aplicou a migration.");
+          },
+        }
       );
-
-      // Persistir no Supabase
-      try {
-        const { error } = await supabase
-          .from('recuperai_pipeline')
-          .update({ etapa: targetColumnId, atualizado_em: new Date().toISOString() })
-          .eq('lead_id', activeLeadData.id);
-
-        if (error) throw error;
-      } catch (err) {
-        toast.error('Erro ao mover lead. Revise se já aplicou a migration.');
-        fetchPipeline(); // reverte alteração
-      }
     }
     setActiveLead(null);
   }
 
-  if (loading && leads.length === 0) {
+  if (isPending && leads.length === 0) {
     return <div className="animate-pulse text-slate-400">Carregando CRM...</div>;
   }
 
