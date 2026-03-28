@@ -1,7 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useClients } from "@/hooks/useClients";
+import { useClientsAdmin } from "@/hooks/queries/useClientsAdmin";
+import { useCreateClient } from "@/hooks/mutations/useCreateClient";
+import { useUpdateClient } from "@/hooks/mutations/useUpdateClient";
+import { updateClient } from "@/services/supabaseService";
 import { ClientTable } from "@/components/clients/ClientTable";
 import { ClientFormDialog } from "@/components/clients/ClientFormDialog";
 import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
@@ -17,16 +20,14 @@ import {
 } from "@/components/ui/dialog";
 
 export default function ClientesPage() {
-  const { clients, loading, error, reload, create, update, deactivate } =
-    useClients();
+  const { data: clients = [], isPending, isError, error, refetch } =
+    useClientsAdmin();
+  const createMutation = useCreateClient();
+  const updateMutation = useUpdateClient();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState(null);
   const [confirmClient, setConfirmClient] = useState(null);
-
-  useEffect(() => {
-    reload();
-  }, [reload]);
 
   const handleCreate = () => {
     setEditingClient(null);
@@ -41,10 +42,10 @@ export default function ClientesPage() {
   const handleSubmit = async (data) => {
     try {
       if (editingClient) {
-        await update(editingClient.id, data);
+        await updateMutation.mutateAsync({ id: editingClient.id, ...data });
         toast.success("Cliente atualizado com sucesso!");
       } else {
-        await create(data);
+        await createMutation.mutateAsync(data);
         toast.success("Cliente criado com sucesso!");
       }
     } catch (e) {
@@ -60,7 +61,8 @@ export default function ClientesPage() {
   const confirmDeactivate = async () => {
     if (!confirmClient) return;
     try {
-      await deactivate(confirmClient.id);
+      await updateClient(confirmClient.id, { status: "inativo" });
+      await refetch();
       toast.success(`${confirmClient.nome_negocio} desativado.`);
     } catch (e) {
       toast.error(e.message || "Erro ao desativar cliente.");
@@ -69,8 +71,8 @@ export default function ClientesPage() {
     }
   };
 
-  if (loading) return <LoadingSkeleton />;
-  if (error) return <ErrorState message={error} onRetry={reload} />;
+  if (isPending) return <LoadingSkeleton />;
+  if (isError) return <ErrorState message={error?.message} onRetry={refetch} />;
 
   return (
     <div className="space-y-6">
