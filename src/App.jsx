@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { DashboardLayout } from "@/layouts/DashboardLayout";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import LoginPage from "@/pages/LoginPage";
 import HomePage from "@/pages/HomePage";
 import ClientesPage from "@/pages/ClientesPage";
 import ClientDetailPage from "@/pages/ClientDetailPage";
@@ -10,12 +12,15 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<DashboardLayout />}>
-          <Route index element={<HomePage />} />
-          <Route path="clientes" element={<ClientesPage />} />
-          <Route path="clientes/:id" element={<ClientDetailPage />} />
-          <Route path="relatorios" element={<RelatoriosPage />} />
-          <Route path="configuracoes" element={<ConfiguracoesPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route element={<ProtectedRoute />}>
+          <Route element={<DashboardLayout />}>
+            <Route index element={<HomePage />} />
+            <Route path="clientes" element={<ClientesPage />} />
+            <Route path="clientes/:id" element={<ClientDetailPage />} />
+            <Route path="relatorios" element={<RelatoriosPage />} />
+            <Route path="configuracoes" element={<ConfiguracoesPage />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>
