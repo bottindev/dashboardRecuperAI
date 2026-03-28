@@ -62,3 +62,44 @@ export async function triggerReport(clientId) {
   if (error) throw new Error(`Report trigger error: ${error.message}`);
   return data;
 }
+
+export async function fetchCeoOverview() {
+  const { data, error } = await supabase
+    .from("ceo_overview")
+    .select("*")
+    .single();
+  if (error) throw new Error(`ceo_overview fetch error: ${error.message}`);
+  return data;
+}
+
+export async function fetchCeoTrend() {
+  const { data, error } = await supabase
+    .from("ceo_monthly_trend")
+    .select("*")
+    .order("month", { ascending: true })
+    .limit(6);
+  if (error) throw new Error(`ceo_monthly_trend fetch error: ${error.message}`);
+  return data;
+}
+
+export async function fetchClientPerformance() {
+  const { data, error } = await supabase
+    .from("ceo_client_performance")
+    .select("*");
+  if (error)
+    throw new Error(`ceo_client_performance fetch error: ${error.message}`);
+  return data;
+}
+
+export async function fetchAlerts(limit = 20) {
+  const { data, error } = await supabase
+    .from("n8n_error_logs")
+    .select(
+      "id,config_cliente_id,workflow_name,error_message,created_at,status,config_clientes(nome_negocio)"
+    )
+    .eq("status", "unresolved")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error) throw new Error(`n8n_error_logs fetch error: ${error.message}`);
+  return data;
+}

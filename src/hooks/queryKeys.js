@@ -25,4 +25,17 @@ export const queryKeys = {
     all: () => ["reports"],
     data: () => ["reports", "data"],
   },
+  ceo: {
+    all: () => ["ceo"],
+    overview: () => ["ceo", "overview"],
+    trend: () => ["ceo", "trend"],
+  },
+  clientPerformance: {
+    all: () => ["clientPerformance"],
+    list: () => ["clientPerformance", "list"],
+  },
+  alerts: {
+    all: () => ["alerts"],
+    recent: () => ["alerts", "recent"],
+  },
 };
