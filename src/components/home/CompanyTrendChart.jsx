@@ -19,7 +19,7 @@ export function CompanyTrendChart({ data }) {
   return (
     <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
       <h3 className="mb-4 text-sm font-medium text-foreground">
-        Receita &amp; Lucro
+        Receita Mensal
       </h3>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
@@ -29,7 +29,7 @@ export function CompanyTrendChart({ data }) {
                 <stop offset="0%" stopColor="#10B981" stopOpacity={0.2} />
                 <stop offset="100%" stopColor="#10B981" stopOpacity={0} />
               </linearGradient>
-              <linearGradient id="gLucroCompany" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="gMrrCompany" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#0EA5E9" stopOpacity={0.2} />
                 <stop offset="100%" stopColor="#0EA5E9" stopOpacity={0} />
               </linearGradient>
@@ -66,11 +66,11 @@ export function CompanyTrendChart({ data }) {
             />
             <Area
               type="monotone"
-              dataKey="lucro"
-              name="Lucro"
+              dataKey="mrr"
+              name="MRR"
               stroke="#0EA5E9"
               strokeWidth={2}
-              fill="url(#gLucroCompany)"
+              fill="url(#gMrrCompany)"
             />
             <Legend
               verticalAlign="bottom"

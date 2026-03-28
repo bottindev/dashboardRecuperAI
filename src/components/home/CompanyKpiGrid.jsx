@@ -10,10 +10,7 @@ function computeDelta(data, key) {
 }
 
 export function CompanyKpiGrid({ overview, trendData }) {
-  const taxaConversao =
-    (overview.total_convertidos_global /
-      Math.max(overview.total_conversas_global, 1)) *
-    100;
+  const taxaConversao = overview.taxa_conversao_leads ?? 0;
 
   const mrrSparkline = trendData
     ? trendData.map((d) => ({ v: d.receita }))
@@ -52,7 +49,7 @@ export function CompanyKpiGrid({ overview, trendData }) {
         value={fmtPct(taxaConversao)}
         icon={TrendingUp}
         color="amber"
-        subtitle="Conversas em agendamentos"
+        subtitle="Leads convertidos em clientes"
       />
     </div>
   );

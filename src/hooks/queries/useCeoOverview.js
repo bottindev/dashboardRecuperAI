@@ -11,6 +11,7 @@ const EMPTY_OVERVIEW = {
   leads_pipeline: 0,
   total_conversas_global: 0,
   total_convertidos_global: 0,
+  taxa_conversao_leads: 0,
 };
 
 export function useCeoOverview() {
