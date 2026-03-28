@@ -1,8 +1,7 @@
 import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useCompanyData } from "@/hooks/useCompanyData";
-import { useAutoRefresh } from "@/hooks/useAutoRefresh";
+import { useOverviewData } from "@/hooks/queries/useOverviewData";
 import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { CompanyKpiGrid } from "@/components/home/CompanyKpiGrid";
@@ -10,22 +9,19 @@ import { CompanyTrendChart } from "@/components/home/CompanyTrendChart";
 import { ClientOverviewCard } from "@/components/home/ClientOverviewCard";
 import { QuickActions } from "@/components/shared/QuickActions";
 
-const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
-
 export default function HomePage() {
   const {
     companyKpis,
     clientSummaries,
     trendData,
-    loading,
+    isPending,
+    isError,
     error,
-    reload,
-  } = useCompanyData();
+    refetch,
+  } = useOverviewData();
 
-  useAutoRefresh(reload, REFRESH_INTERVAL_MS);
-
-  if (loading) return <LoadingSkeleton />;
-  if (error) return <ErrorState message={error} onRetry={reload} />;
+  if (isPending) return <LoadingSkeleton />;
+  if (isError) return <ErrorState message={error?.message} onRetry={refetch} />;
 
   return (
     <div className="space-y-6">
@@ -40,7 +36,7 @@ export default function HomePage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={reload}>
+          <Button variant="outline" size="sm" onClick={refetch}>
             <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
             Atualizar
           </Button>
