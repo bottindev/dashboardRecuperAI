@@ -1,74 +1,81 @@
-import { RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { useOverviewData } from "@/hooks/queries/useOverviewData";
+import { useCeoOverview } from "@/hooks/queries/useCeoOverview";
+import { useCeoTrend } from "@/hooks/queries/useCeoTrend";
+import { useClientPerformance } from "@/hooks/queries/useClientPerformance";
 import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { CeoHeader } from "@/components/home/CeoHeader";
 import { CompanyKpiGrid } from "@/components/home/CompanyKpiGrid";
 import { CompanyTrendChart } from "@/components/home/CompanyTrendChart";
 import { ClientOverviewCard } from "@/components/home/ClientOverviewCard";
-import { QuickActions } from "@/components/shared/QuickActions";
 
 export default function HomePage() {
   const {
-    companyKpis,
-    clientSummaries,
-    trendData,
-    isPending,
-    isError,
-    error,
-    refetch,
-  } = useOverviewData();
+    overview,
+    dataUpdatedAt,
+    isPending: kpiPending,
+    isError: kpiError,
+    error: kpiErr,
+    refetch: refetchKpi,
+    isRefetching: kpiRefetching,
+  } = useCeoOverview();
 
-  if (isPending) return <LoadingSkeleton />;
-  if (isError) return <ErrorState message={error?.message} onRetry={refetch} />;
+  const {
+    trendData,
+    isPending: trendPending,
+    isError: trendError,
+    error: trendErr,
+  } = useCeoTrend();
+
+  const {
+    clients,
+    isPending: clientsPending,
+    isError: clientsError,
+    error: clientsErr,
+  } = useClientPerformance();
+
+  if (kpiPending && trendPending && clientsPending) {
+    return <LoadingSkeleton />;
+  }
+
+  const firstError = kpiError
+    ? kpiErr
+    : trendError
+      ? trendErr
+      : clientsError
+        ? clientsErr
+        : null;
+
+  if (firstError) {
+    return <ErrorState message={firstError?.message} onRetry={refetchKpi} />;
+  }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-xl font-semibold text-foreground">
-            Visao Geral
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Metricas agregadas de todos os clientes
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={refetch}>
-            <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
-            Atualizar
-          </Button>
-          <Badge variant="outline" className="border-emerald/30 text-emerald">
-            <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-emerald animate-pulse" />
-            Ao vivo
-          </Badge>
-        </div>
-      </div>
+      <CeoHeader
+        dataUpdatedAt={dataUpdatedAt}
+        onRefresh={() => refetchKpi()}
+        isRefetching={kpiRefetching}
+      />
 
-      {/* Company KPIs */}
-      <CompanyKpiGrid kpis={companyKpis} />
+      <CompanyKpiGrid overview={overview} trendData={trendData} />
 
-      {/* Trend Chart */}
       {trendData.length > 0 && <CompanyTrendChart data={trendData} />}
 
-      {/* Client Cards Grid */}
-      {clientSummaries.length > 0 && (
-        <div>
+      {clients.length > 0 && (
+        <section>
           <h3 className="mb-3 text-sm font-medium text-foreground">
             Clientes
           </h3>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {clientSummaries.map((client) => (
-              <ClientOverviewCard key={client.id} client={client} />
+            {clients.map((client) => (
+              <ClientOverviewCard
+                key={client.config_cliente_id}
+                client={client}
+              />
             ))}
           </div>
-        </div>
+        </section>
       )}
-
-      {/* Quick Actions */}
-      <QuickActions />
     </div>
   );
 }
