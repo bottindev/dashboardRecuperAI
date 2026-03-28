@@ -23,8 +23,8 @@ function isValidClient(item) {
     item &&
     typeof item === "object" &&
     typeof item.id !== "undefined" &&
-    typeof item.name === "string" &&
-    item.name.trim() !== ""
+    typeof item.nome_negocio === "string" &&
+    item.nome_negocio.trim() !== ""
   );
 }
 
