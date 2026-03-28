@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Printer, FileSpreadsheet } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useDashboardData } from "@/hooks/useDashboardData";
+import { useReportData } from "@/hooks/queries/useReportData";
 import { MonthPicker } from "@/components/shared/MonthPicker";
 import { ReportContent } from "@/components/reports/ReportContent";
 import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
@@ -20,13 +20,9 @@ function getDefaultMonth() {
 }
 
 export default function RelatoriosPage() {
-  const { clients, metrics, loading, error, reload } = useDashboardData();
+  const { clients, metrics, isPending, isError, error, refetch } = useReportData();
   const [monthVal, setMonthVal] = useState(getDefaultMonth);
   const [selectedClient, setSelectedClient] = useState("all");
-
-  useEffect(() => {
-    reload();
-  }, [reload]);
 
   const monthStr = `${monthVal.year}-${String(monthVal.month + 1).padStart(2, "0")}`;
   const monthLabel = `${MONTHS_PT[monthVal.month]} ${monthVal.year}`;
@@ -46,15 +42,15 @@ export default function RelatoriosPage() {
   const handleExcel = async () => {
     try {
       const { exportToExcel } = await import("@/services/exportExcel");
-      exportToExcel(filtered, clients, monthLabel);
+      await exportToExcel(filtered, clients, monthLabel);
       toast.success("Excel exportado com sucesso!");
     } catch (e) {
       toast.error("Erro ao exportar Excel: " + e.message);
     }
   };
 
-  if (loading) return <LoadingSkeleton />;
-  if (error) return <ErrorState message={error} onRetry={reload} />;
+  if (isPending) return <LoadingSkeleton />;
+  if (isError) return <ErrorState message={error?.message} onRetry={refetch} />;
 
   return (
     <div className="space-y-6">

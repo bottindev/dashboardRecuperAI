@@ -3,8 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { RefreshCw, ChevronRight, Bot, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useDashboardData } from "@/hooks/useDashboardData";
-import { useAutoRefresh } from "@/hooks/useAutoRefresh";
+import { useClientDetailData } from "@/hooks/queries/useClientDetailData";
 import { filterByPeriod, computeTotals, computeChartData } from "@/utils/metricsComputation";
 import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
 import { ErrorState } from "@/components/shared/ErrorState";
@@ -19,24 +18,18 @@ import { RoiSummary } from "@/components/dashboard/RoiSummary";
 import { PerformanceTable } from "@/components/dashboard/PerformanceTable";
 import { fmtInt } from "@/utils/formatters";
 
-const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
-
 export default function ClientDetailPage() {
   const { id } = useParams();
-  const { clients, metrics, loading, error, reload } = useDashboardData();
+  const {
+    client,
+    clientMetrics,
+    allClients,
+    isPending,
+    isError,
+    error,
+    refetch,
+  } = useClientDetailData(id);
   const [period, setPeriod] = useState("all");
-
-  useAutoRefresh(reload, REFRESH_INTERVAL_MS);
-
-  const client = useMemo(
-    () => clients.find((c) => c.id === id),
-    [clients, id]
-  );
-
-  const clientMetrics = useMemo(
-    () => metrics.filter((m) => m.client_id === id),
-    [metrics, id]
-  );
 
   const periodMonths = period === "all" ? null : Number(period);
   const filtered = useMemo(
@@ -47,8 +40,8 @@ export default function ClientDetailPage() {
   const totals = useMemo(() => computeTotals(filtered), [filtered]);
   const chartData = useMemo(() => computeChartData(filtered), [filtered]);
 
-  if (loading) return <LoadingSkeleton />;
-  if (error) return <ErrorState message={error} onRetry={reload} />;
+  if (isPending) return <LoadingSkeleton />;
+  if (isError) return <ErrorState message={error?.message} onRetry={refetch} />;
 
   if (!client) {
     return (
@@ -87,7 +80,7 @@ export default function ClientDetailPage() {
         </nav>
         <div className="flex items-center gap-3">
           <PeriodSelector value={period} onChange={setPeriod} />
-          <Button variant="outline" size="sm" onClick={reload}>
+          <Button variant="outline" size="sm" onClick={refetch}>
             <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
             Atualizar
           </Button>
@@ -147,7 +140,7 @@ export default function ClientDetailPage() {
       <RoiSummary totals={totals} />
 
       {/* Performance Table */}
-      <PerformanceTable metrics={filtered} clients={clients} />
+      <PerformanceTable metrics={filtered} clients={allClients} />
     </div>
   );
 }
