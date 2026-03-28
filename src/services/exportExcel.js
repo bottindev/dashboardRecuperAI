@@ -1,8 +1,8 @@
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 import { fmt, fmtInt } from "@/utils/formatters";
 
-export function exportToExcel(metrics, clients, monthLabel) {
-  const wb = XLSX.utils.book_new();
+export async function exportToExcel(metrics, clients, monthLabel) {
+  const wb = new ExcelJS.Workbook();
 
   // Sheet 1: Resumo
   const totalRecovered = metrics.reduce(
@@ -22,7 +22,8 @@ export function exportToExcel(metrics, clients, monthLabel) {
     0
   );
 
-  const resumo = [
+  const ws1 = wb.addWorksheet("Resumo");
+  const resumoData = [
     ["RecuperAI - Relatorio", monthLabel],
     [],
     ["Metrica", "Valor"],
@@ -44,35 +45,65 @@ export function exportToExcel(metrics, clients, monthLabel) {
         : "N/A",
     ],
   ];
-  const ws1 = XLSX.utils.aoa_to_sheet(resumo);
-  XLSX.utils.book_append_sheet(wb, ws1, "Resumo");
+  for (const row of resumoData) {
+    ws1.addRow(row);
+  }
 
   // Sheet 2: Metricas por Mes
-  const metricRows = metrics.map((m) => ({
-    Cliente: m.client_name || "—",
-    Mes: m.month,
-    Atendimentos: Number(m.total_conversations || 0),
-    Conversoes: Number(m.converted_conversations || 0),
-    "Taxa (%)": Number(m.conversion_rate || 0).toFixed(1),
-    "Receita (R$)": Number(m.total_recovered_value || 0),
-    "Investimento (R$)": Number(m.service_investment || 0),
-    "Lucro (R$)": Number(m.profit || 0),
-    "ROI (%)": Number(m.roi_percent || 0).toFixed(0),
-    "Ticket Medio (R$)": Number(m.avg_ticket || 0).toFixed(2),
-  }));
-  const ws2 = XLSX.utils.json_to_sheet(metricRows);
-  XLSX.utils.book_append_sheet(wb, ws2, "Metricas Mensais");
+  const ws2 = wb.addWorksheet("Metricas Mensais");
+  ws2.columns = [
+    { header: "Cliente", key: "cliente", width: 25 },
+    { header: "Mes", key: "mes", width: 12 },
+    { header: "Atendimentos", key: "atendimentos", width: 14 },
+    { header: "Conversoes", key: "conversoes", width: 12 },
+    { header: "Taxa (%)", key: "taxa", width: 10 },
+    { header: "Receita (R$)", key: "receita", width: 14 },
+    { header: "Investimento (R$)", key: "investimento", width: 16 },
+    { header: "Lucro (R$)", key: "lucro", width: 12 },
+    { header: "ROI (%)", key: "roi", width: 10 },
+    { header: "Ticket Medio (R$)", key: "ticket", width: 16 },
+  ];
+  for (const m of metrics) {
+    ws2.addRow({
+      cliente: m.client_name || "\u2014",
+      mes: m.month,
+      atendimentos: Number(m.total_conversations || 0),
+      conversoes: Number(m.converted_conversations || 0),
+      taxa: Number(m.conversion_rate || 0).toFixed(1),
+      receita: Number(m.total_recovered_value || 0),
+      investimento: Number(m.service_investment || 0),
+      lucro: Number(m.profit || 0),
+      roi: Number(m.roi_percent || 0).toFixed(0),
+      ticket: Number(m.avg_ticket || 0).toFixed(2),
+    });
+  }
 
   // Sheet 3: Clientes
-  const clientRows = clients.map((c) => ({
-    Nome: c.nome_negocio || c.name || "—",
-    Status: c.status || "ativo",
-    "Investimento Mensal (R$)": c.investimento_mensal || 0,
-    "WhatsApp Relatorio": c.whatsapp_relatorio || "—",
-  }));
-  const ws3 = XLSX.utils.json_to_sheet(clientRows);
-  XLSX.utils.book_append_sheet(wb, ws3, "Clientes");
+  const ws3 = wb.addWorksheet("Clientes");
+  ws3.columns = [
+    { header: "Nome", key: "nome", width: 30 },
+    { header: "Status", key: "status", width: 12 },
+    { header: "Investimento Mensal (R$)", key: "investimento", width: 22 },
+    { header: "WhatsApp Relatorio", key: "whatsapp", width: 20 },
+  ];
+  for (const c of clients) {
+    ws3.addRow({
+      nome: c.nome_negocio || c.name || "\u2014",
+      status: c.status || "ativo",
+      investimento: c.investimento_mensal || 0,
+      whatsapp: c.whatsapp_relatorio || "\u2014",
+    });
+  }
 
   const filename = `RecuperAI_Relatorio_${monthLabel.replace(/\s/g, "_")}.xlsx`;
-  XLSX.writeFile(wb, filename);
+  const buffer = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
 }
