@@ -103,3 +103,119 @@ export async function fetchAlerts(limit = 20) {
   if (error) throw new Error(`n8n_error_logs fetch error: ${error.message}`);
   return data;
 }
+
+// --- Phase 5: Per-client fetch functions ---
+
+export async function fetchClientConfig(clientId) {
+  const { data, error } = await supabase
+    .from("config_clientes")
+    .select("*")
+    .eq("id", clientId)
+    .single();
+  if (error)
+    throw new Error(`config_clientes fetch error: ${error.message}`);
+  return data;
+}
+
+export async function fetchClientConversations(clientId, limit = 20) {
+  const { data, error } = await supabase
+    .from("conversations")
+    .select(
+      "id,customer_phone,customer_name,outcome,messages_count,first_message,started_at,ended_at"
+    )
+    .eq("config_cliente_id", clientId)
+    .order("started_at", { ascending: false })
+    .limit(limit);
+  if (error)
+    throw new Error(`conversations fetch error: ${error.message}`);
+  return data;
+}
+
+export async function fetchClientMetricsDetail(clientId) {
+  const { data, error } = await supabase
+    .from("recuperai_monthly_metrics")
+    .select("*")
+    .eq("client_id", clientId)
+    .order("month", { ascending: true })
+    .limit(6);
+  if (error)
+    throw new Error(`recuperai_monthly_metrics fetch error: ${error.message}`);
+  return data;
+}
+
+export async function fetchClientServices(clientId) {
+  const { data, error } = await supabase
+    .from("servicos")
+    .select("*")
+    .eq("config_cliente_id", clientId)
+    .order("nome_servico");
+  if (error) throw new Error(`servicos fetch error: ${error.message}`);
+  return data;
+}
+
+export async function fetchClientSchedule(clientId) {
+  const { data, error } = await supabase
+    .from("horarios_funcionamento")
+    .select("*")
+    .eq("config_cliente_id", clientId)
+    .order("dia_semana");
+  if (error)
+    throw new Error(`horarios_funcionamento fetch error: ${error.message}`);
+  return data;
+}
+
+export async function fetchClientClosedDates(clientId) {
+  const { data, error } = await supabase
+    .from("datas_fechadas")
+    .select("*")
+    .eq("config_cliente_id", clientId)
+    .order("data_inicio", { ascending: false });
+  if (error)
+    throw new Error(`datas_fechadas fetch error: ${error.message}`);
+  return data;
+}
+
+// --- Phase 5: Mutation functions ---
+
+export async function updateService(id, updates) {
+  const { data, error } = await supabase
+    .from("servicos")
+    .update(updates)
+    .eq("id", id)
+    .select()
+    .single();
+  if (error) throw new Error(`servicos update error: ${error.message}`);
+  return data;
+}
+
+export async function updateScheduleDay(id, updates) {
+  const { data, error } = await supabase
+    .from("horarios_funcionamento")
+    .update(updates)
+    .eq("id", id)
+    .select()
+    .single();
+  if (error)
+    throw new Error(`horarios_funcionamento update error: ${error.message}`);
+  return data;
+}
+
+export async function createClosedDate(data) {
+  const { data: result, error } = await supabase
+    .from("datas_fechadas")
+    .insert(data)
+    .select()
+    .single();
+  if (error)
+    throw new Error(`datas_fechadas insert error: ${error.message}`);
+  return result;
+}
+
+export async function deleteClosedDate(id) {
+  const { error } = await supabase
+    .from("datas_fechadas")
+    .delete()
+    .eq("id", id);
+  if (error)
+    throw new Error(`datas_fechadas delete error: ${error.message}`);
+}
