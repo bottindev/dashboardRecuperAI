@@ -14,14 +14,23 @@ async function fetchPipelineLeads() {
       `
       etapa,
       lead_id,
+      atualizado_em,
       recuperai_leads (
         id,
         nome,
         telefone,
         nome_negocio,
+        email,
+        origem,
+        source,
+        bant_budget_score,
+        bant_authority_score,
+        bant_need_score,
+        bant_timeline_score,
         bant_total_score,
         lead_tier,
-        call_agendada_at
+        call_agendada_at,
+        created_at
       )
     `
     )
@@ -35,6 +44,7 @@ async function fetchPipelineLeads() {
     .map((row) => ({
       ...row.recuperai_leads,
       etapa: row.etapa || "novo",
+      stage_updated_at: row.atualizado_em,
     }))
     .filter((l) => l.id);
 }

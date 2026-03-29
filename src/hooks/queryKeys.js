@@ -23,6 +23,8 @@ export const queryKeys = {
   pipeline: {
     all: () => ["pipeline"],
     leads: () => ["pipeline", "leads"],
+    detail: (id) => ["pipeline", "detail", id],
+    interactions: (id) => ["pipeline", "interactions", id],
   },
   configClientes: {
     all: () => ["configClientes"],
