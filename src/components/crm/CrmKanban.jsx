@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback, useRef } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -8,22 +8,25 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import {
-  SortableContext,
-  arrayMove,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-  useSortable,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { toast } from "sonner";
-import { Calendar, Flame, Coffee, UserX } from "lucide-react";
+import { Filter, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePipelineData } from "@/hooks/queries/usePipelineData";
 import { useMovePipelineLead } from "@/hooks/mutations/useMovePipelineLead";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { KanbanCard } from "./KanbanCard";
+import { KanbanColumn } from "./KanbanColumn";
+import { KanbanScrollContainer } from "./KanbanScrollContainer";
 
-// --- Configuração das Colunas ---
-// TODO Phase 2+: Follow Up badge/tag on lead cards (not a column)
+// --- Column configuration ---
 const COLUMNS = [
   { id: "novo", title: "Lead", color: "bg-slate-800" },
   { id: "call_agendada", title: "Call Agendada", color: "bg-blue-950" },
@@ -32,117 +35,73 @@ const COLUMNS = [
   { id: "ativo", title: "Ativo", color: "bg-green-950" },
 ];
 
-function getScoreColor(score) {
-  if (!score) return "text-slate-400 bg-slate-800";
-  if (score >= 70) return "text-orange-500 bg-orange-500/10 border-orange-500/20";
-  if (score >= 40) return "text-yellow-500 bg-yellow-500/10 border-yellow-500/20";
-  return "text-red-500 bg-red-500/10 border-red-500/20";
-}
+const TIER_OPTIONS = ["hot", "warm", "cold"];
 
-// --- Componente: Card Sortable ---
-function SortableKanbanCard({ lead }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: lead.id, data: { type: "Card", lead } });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className={cn(
-        "cursor-grab active:cursor-grabbing rounded-lg border border-white/10 bg-sidebar-bg/50 p-3 shadow-md backdrop-blur-sm transition-colors hover:bg-white/5",
-        isDragging && "ring-2 ring-sky/50"
-      )}
-    >
-      <div className="flex items-start justify-between">
-        <div>
-          <h4 className="font-medium text-slate-200">{lead.nome}</h4>
-          <p className="text-xs text-slate-400 line-clamp-1">{lead.nome_negocio || lead.telefone}</p>
-        </div>
-        <div className={cn("flex items-center justify-center rounded-full border px-2 py-0.5 text-xs font-bold", getScoreColor(lead.bant_total_score))}>
-          {lead.bant_total_score || 0}
-        </div>
-      </div>
-      <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
-        <span className="flex items-center gap-1">
-          {lead.lead_tier === 'hot' && <Flame className="h-3 w-3 text-orange-500" />}
-          {lead.lead_tier === 'warm' && <Coffee className="h-3 w-3 text-yellow-500" />}
-          {lead.lead_tier === 'cold' && <UserX className="h-3 w-3 text-red-500" />}
-          {lead.lead_tier || 'novo'}
-        </span>
-        {lead.call_agendada_at && (
-          <span className="flex items-center gap-1 text-emerald-400">
-            <Calendar className="h-3 w-3" />
-            Agenda
-          </span>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// --- Componente: Coluna ---
-function KanbanColumn({ column, leads }) {
-  const { setNodeRef } = useSortable({
-    id: column.id,
-    data: { type: "Column", column },
-  });
-
-  return (
-    <div className="flex flex-col gap-2 w-80 shrink-0">
-      <div className={cn("flex items-center justify-between rounded-t-lg border-b-2 border-transparent px-4 py-3 text-sm font-semibold text-slate-200", column.color)}>
-        <div className="flex items-center gap-2">
-          <span>{column.title}</span>
-          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/10 text-xs font-normal">
-            {leads.length}
-          </span>
-        </div>
-      </div>
-
-      <div
-        ref={setNodeRef}
-        className="flex flex-1 flex-col gap-2 rounded-b-lg border border-white/5 bg-black/20 p-2 min-h-[500px]"
-      >
-        <SortableContext
-          items={leads.map(l => l.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          {leads.map((lead) => (
-            <SortableKanbanCard key={lead.id} lead={lead} />
-          ))}
-        </SortableContext>
-      </div>
-    </div>
-  );
-}
-
-// --- Principal: Board ---
 export function CrmKanban() {
   const { data: leads = [], isPending } = usePipelineData();
   const moveLead = useMovePipelineLead();
 
   const [activeLead, setActiveLead] = useState(null);
+  const [selectedLeadId, setSelectedLeadId] = useState(null);
+  const [highlightedLeadId, setHighlightedLeadId] = useState(null);
+  const highlightTimerRef = useRef(null);
 
-  // Sensores do DnD Kit
+  // Filters
+  const [tierFilter, setTierFilter] = useState(null);
+  const [origemFilter, setOrigemFilter] = useState(null);
+
+  // Derive unique origins from data
+  const uniqueOrigens = useMemo(() => {
+    const origins = new Set();
+    for (const lead of leads) {
+      const val = lead.origem || lead.source;
+      if (val) origins.add(val);
+    }
+    return Array.from(origins).sort();
+  }, [leads]);
+
+  // Filter leads
+  const filteredLeads = useMemo(() => {
+    let result = leads;
+    if (tierFilter) {
+      result = result.filter((l) => l.lead_tier === tierFilter);
+    }
+    if (origemFilter) {
+      result = result.filter(
+        (l) => (l.origem || l.source) === origemFilter
+      );
+    }
+    return result;
+  }, [leads, tierFilter, origemFilter]);
+
+  const hasActiveFilters = tierFilter != null || origemFilter != null;
+
+  // Card selection with post-close highlight
+  const handleSelectLead = useCallback((leadId) => {
+    setSelectedLeadId(leadId);
+  }, []);
+
+  // When Sheet closes, briefly highlight the card (for Plan 03 wiring)
+  const handleCloseSheet = useCallback(() => {
+    const prevId = selectedLeadId;
+    setSelectedLeadId(null);
+    if (prevId) {
+      setHighlightedLeadId(prevId);
+      if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
+      highlightTimerRef.current = setTimeout(() => {
+        setHighlightedLeadId(null);
+      }, 2000);
+    }
+  }, [selectedLeadId]);
+
+  // DnD sensors
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
   );
 
-  // Handle Drag Events
   function handleDragStart(event) {
     if (event.active.data.current?.type === "Card") {
       setActiveLead(event.active.data.current.lead);
@@ -151,24 +110,26 @@ export function CrmKanban() {
 
   function handleDragEnd(event) {
     const { active, over } = event;
-    if (!over) return;
-
-    const activeId = active.id;
-    const overId = over.id;
+    if (!over) {
+      setActiveLead(null);
+      return;
+    }
 
     const activeLeadData = active.data.current?.lead;
     const overType = over.data.current?.type;
-
-    if (!activeLeadData) return;
+    if (!activeLeadData) {
+      setActiveLead(null);
+      return;
+    }
 
     let targetColumnId = activeLeadData.etapa;
 
     if (overType === "Column") {
-      targetColumnId = overId;
+      targetColumnId = over.data.current?.column?.id ?? over.id;
     } else if (overType === "Card") {
       const overLead = over.data.current?.lead;
       if (overLead) {
-         targetColumnId = overLead.etapa;
+        targetColumnId = overLead.etapa;
       }
     }
 
@@ -177,7 +138,9 @@ export function CrmKanban() {
         { leadId: activeLeadData.id, newEtapa: targetColumnId },
         {
           onError: () => {
-            toast.error("Erro ao mover lead. Revise se ja aplicou a migration.");
+            toast.error(
+              "Erro ao mover lead. Revise se ja aplicou a migration."
+            );
           },
         }
       );
@@ -186,29 +149,109 @@ export function CrmKanban() {
   }
 
   if (isPending && leads.length === 0) {
-    return <div className="animate-pulse text-slate-400">Carregando CRM...</div>;
+    return (
+      <div className="animate-pulse text-slate-400">Carregando CRM...</div>
+    );
   }
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCorners}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-    >
-      <div className="flex h-full w-full gap-4 overflow-x-auto pb-4 pt-2">
-        {COLUMNS.map((col) => (
-          <KanbanColumn
-            key={col.id}
-            column={col}
-            leads={leads.filter((l) => l.etapa === col.id)}
-          />
-        ))}
+    <div className="flex h-full flex-col gap-3">
+      {/* Filter bar */}
+      <div className="flex items-center gap-2">
+        <Filter className="h-4 w-4 text-slate-500" />
+
+        {/* Tier filter */}
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            className={cn(
+              "rounded-md border border-white/10 px-3 py-1.5 text-xs font-medium text-slate-300 transition-colors hover:bg-white/5",
+              tierFilter && "border-white/25 bg-white/5"
+            )}
+          >
+            {tierFilter
+              ? tierFilter.charAt(0).toUpperCase() + tierFilter.slice(1)
+              : "Tier"}
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuLabel>Filtrar por tier</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => setTierFilter(null)}>
+              Todos
+            </DropdownMenuItem>
+            {TIER_OPTIONS.map((t) => (
+              <DropdownMenuItem key={t} onClick={() => setTierFilter(t)}>
+                {t.charAt(0).toUpperCase() + t.slice(1)}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Origin filter */}
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            className={cn(
+              "rounded-md border border-white/10 px-3 py-1.5 text-xs font-medium text-slate-300 transition-colors hover:bg-white/5",
+              origemFilter && "border-white/25 bg-white/5"
+            )}
+          >
+            {origemFilter || "Origem"}
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuLabel>Filtrar por origem</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => setOrigemFilter(null)}>
+              Todas
+            </DropdownMenuItem>
+            {uniqueOrigens.map((o) => (
+              <DropdownMenuItem key={o} onClick={() => setOrigemFilter(o)}>
+                {o}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Clear filters */}
+        {hasActiveFilters && (
+          <button
+            type="button"
+            onClick={() => {
+              setTierFilter(null);
+              setOrigemFilter(null);
+            }}
+            className="flex items-center gap-1 rounded-md px-2 py-1.5 text-xs text-slate-400 transition-colors hover:text-slate-200"
+          >
+            <X className="h-3 w-3" />
+            Limpar
+          </button>
+        )}
       </div>
 
-      <DragOverlay>
-        {activeLead ? <SortableKanbanCard lead={activeLead} /> : null}
-      </DragOverlay>
-    </DndContext>
+      {/* Kanban board */}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCorners}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
+        <KanbanScrollContainer>
+          {COLUMNS.map((col) => (
+            <KanbanColumn
+              key={col.id}
+              column={col}
+              leads={filteredLeads.filter((l) => l.etapa === col.id)}
+              onSelectLead={handleSelectLead}
+              highlightedLeadId={highlightedLeadId}
+            />
+          ))}
+        </KanbanScrollContainer>
+
+        <DragOverlay>
+          {activeLead ? <KanbanCard lead={activeLead} /> : null}
+        </DragOverlay>
+      </DndContext>
+
+      {/* LeadDetailSheet rendered here by Plan 03 */}
+      {/* <LeadDetailSheet leadId={selectedLeadId} open={!!selectedLeadId} onClose={handleCloseSheet} /> */}
+    </div>
   );
 }
