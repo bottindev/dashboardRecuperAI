@@ -8,6 +8,7 @@ import { ClientHeader } from "@/components/client-detail/ClientHeader";
 import { TabOverview } from "@/components/client-detail/TabOverview";
 import { TabConversations } from "@/components/client-detail/TabConversations";
 import { TabMetrics } from "@/components/client-detail/TabMetrics";
+import { TabConfig } from "@/components/client-detail/TabConfig";
 
 const TAB_VALUES = ["overview", "conversations", "metrics", "config"];
 
@@ -64,11 +65,7 @@ export default function ClientDetailPage() {
         {activeTab === "overview" && <TabOverview clientId={id} />}
         {activeTab === "conversations" && <TabConversations clientId={id} />}
         {activeTab === "metrics" && <TabMetrics clientId={id} />}
-        {activeTab === "config" && (
-          <div className="py-12 text-center text-muted-foreground">
-            Configuracao em desenvolvimento
-          </div>
-        )}
+        {activeTab === "config" && <TabConfig clientId={id} />}
       </div>
     </div>
   );
