@@ -25,6 +25,7 @@ import {
 import { KanbanCard } from "./KanbanCard";
 import { KanbanColumn } from "./KanbanColumn";
 import { KanbanScrollContainer } from "./KanbanScrollContainer";
+import { LeadDetailSheet } from "./LeadDetailSheet";
 
 // --- Column configuration ---
 const COLUMNS = [
@@ -250,8 +251,11 @@ export function CrmKanban() {
         </DragOverlay>
       </DndContext>
 
-      {/* LeadDetailSheet rendered here by Plan 03 */}
-      {/* <LeadDetailSheet leadId={selectedLeadId} open={!!selectedLeadId} onClose={handleCloseSheet} /> */}
+      <LeadDetailSheet
+        leadId={selectedLeadId}
+        open={!!selectedLeadId}
+        onClose={handleCloseSheet}
+      />
     </div>
   );
 }
