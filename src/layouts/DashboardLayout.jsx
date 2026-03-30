@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 const PAGE_TITLES = {
   "/": "Home",
   "/clientes": "Clientes",
+  "/crm": "CRM",
   "/relatorios": "Relatorios",
   "/configuracoes": "Configuracoes",
 };

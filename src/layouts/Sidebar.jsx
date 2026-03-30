@@ -2,6 +2,7 @@ import { NavLink } from "react-router-dom";
 import {
   Home,
   Users,
+  Kanban,
   FileBarChart,
   Settings,
   ChevronLeft,
@@ -12,6 +13,7 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { to: "/", icon: Home, label: "Home" },
   { to: "/clientes", icon: Users, label: "Clientes" },
+  { to: "/crm", icon: Kanban, label: "CRM" },
   { to: "/relatorios", icon: FileBarChart, label: "Relatorios" },
   { to: "/configuracoes", icon: Settings, label: "Configuracoes" },
 ];

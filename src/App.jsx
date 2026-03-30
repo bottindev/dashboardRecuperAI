@@ -6,6 +6,7 @@ import HomePage from "@/pages/HomePage";
 import ClientesPage from "@/pages/ClientesPage";
 import ClientDetailPage from "@/pages/ClientDetailPage";
 import RelatoriosPage from "@/pages/RelatoriosPage";
+import CrmPage from "@/pages/CrmPage";
 import ConfiguracoesPage from "@/pages/ConfiguracoesPage";
 
 export default function App() {
@@ -18,6 +19,7 @@ export default function App() {
             <Route index element={<HomePage />} />
             <Route path="clientes" element={<ClientesPage />} />
             <Route path="clientes/:id" element={<ClientDetailPage />} />
+            <Route path="crm" element={<CrmPage />} />
             <Route path="relatorios" element={<RelatoriosPage />} />
             <Route path="configuracoes" element={<ConfiguracoesPage />} />
           </Route>
