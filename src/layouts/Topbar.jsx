@@ -7,6 +7,7 @@ import { AlertBell } from "@/components/alerts/AlertBell";
 const pageTitles = {
   "/": "Home",
   "/clientes": "Clientes",
+  "/crm": "CRM",
   "/relatorios": "Relatorios",
   "/configuracoes": "Configuracoes",
 };
