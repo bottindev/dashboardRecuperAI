@@ -46,7 +46,7 @@ export function KanbanCard({ lead, onSelect, highlighted = false }) {
       ? "text-red-400"
       : days > 7
         ? "text-amber-400"
-        : "text-slate-500";
+        : "text-muted-foreground";
 
   const origin = lead.origem || lead.source || "Desconhecido";
 
@@ -64,30 +64,30 @@ export function KanbanCard({ lead, onSelect, highlighted = false }) {
       {...listeners}
       onClick={handleClick}
       className={cn(
-        "cursor-pointer rounded-lg border border-white/10 bg-sidebar-bg/50 p-3 shadow-md backdrop-blur-sm transition-all hover:bg-white/5",
+        "cursor-pointer rounded-lg border border-border bg-card p-3 shadow-md backdrop-blur-sm transition-all hover:bg-accent",
         isDragging && "ring-2 ring-sky/50",
         highlighted && "border-blue-500 ring-1 ring-blue-500/40"
       )}
     >
       {/* Row 1: Name + Tier */}
       <div className="flex items-start justify-between gap-2">
-        <h4 className="font-medium text-slate-200 line-clamp-1">
+        <h4 className="font-medium text-foreground line-clamp-1">
           {lead.nome}
         </h4>
         <TierBadge tier={lead.lead_tier} />
       </div>
 
       {/* Row 2: Business or phone */}
-      <p className="mt-1 text-xs text-slate-400 line-clamp-1">
+      <p className="mt-1 text-xs text-muted-foreground line-clamp-1">
         {lead.nome_negocio || lead.telefone}
       </p>
 
       {/* Row 3: BANT dots + origin + time-in-stage */}
       <div className="mt-3 flex items-center justify-between">
         <BantDots lead={lead} />
-        <span className="flex items-center gap-1 text-xs text-slate-500">
+        <span className="flex items-center gap-1 text-xs text-muted-foreground">
           <span>{origin}</span>
-          <span className="text-slate-600">&middot;</span>
+          <span className="text-muted-foreground/50">&middot;</span>
           <span className={timeColor}>{timeLabel}</span>
         </span>
       </div>

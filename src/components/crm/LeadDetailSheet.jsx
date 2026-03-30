@@ -98,7 +98,7 @@ function EditableField({ label, value, onSave }) {
   if (editing) {
     return (
       <div className="flex items-center gap-1">
-        <span className="w-20 shrink-0 text-xs text-slate-500">{label}</span>
+        <span className="w-20 shrink-0 text-xs text-muted-foreground">{label}</span>
         <Input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
@@ -110,7 +110,7 @@ function EditableField({ label, value, onSave }) {
         <button type="button" onClick={save} className="text-emerald-400">
           <Check className="h-3.5 w-3.5" />
         </button>
-        <button type="button" onClick={cancel} className="text-slate-500">
+        <button type="button" onClick={cancel} className="text-muted-foreground">
           <X className="h-3.5 w-3.5" />
         </button>
       </div>
@@ -119,14 +119,14 @@ function EditableField({ label, value, onSave }) {
 
   return (
     <div
-      className="group flex cursor-pointer items-center gap-1 rounded px-1 py-0.5 hover:bg-white/5"
+      className="group flex cursor-pointer items-center gap-1 rounded px-1 py-0.5 hover:bg-muted"
       onClick={startEditing}
     >
-      <span className="w-20 shrink-0 text-xs text-slate-500">{label}</span>
-      <span className="flex-1 text-sm text-slate-300">
-        {value || <span className="italic text-slate-600">vazio</span>}
+      <span className="w-20 shrink-0 text-xs text-muted-foreground">{label}</span>
+      <span className="flex-1 text-sm text-foreground">
+        {value || <span className="italic text-muted-foreground/60">vazio</span>}
       </span>
-      <Pencil className="h-3 w-3 text-slate-600 opacity-0 group-hover:opacity-100" />
+      <Pencil className="h-3 w-3 text-muted-foreground/60 opacity-0 group-hover:opacity-100" />
     </div>
   );
 }
@@ -262,7 +262,7 @@ export function LeadDetailSheet({ leadId, open, onClose }) {
           <>
             {/* ===== Section 1: Header ===== */}
             <SheetHeader>
-              <SheetTitle className="text-lg font-semibold text-slate-100">
+              <SheetTitle className="text-lg font-semibold text-foreground">
                 {lead.nome}
               </SheetTitle>
               <SheetDescription className="sr-only">
@@ -273,7 +273,7 @@ export function LeadDetailSheet({ leadId, open, onClose }) {
               {lead.telefone && (
                 <a
                   href={`tel:${lead.telefone}`}
-                  className="inline-flex items-center gap-1 text-sm text-slate-400 hover:text-slate-200"
+                  className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-slate-200"
                 >
                   <Phone className="h-3.5 w-3.5" />
                   {lead.telefone}
@@ -281,7 +281,7 @@ export function LeadDetailSheet({ leadId, open, onClose }) {
               )}
 
               {/* Origin */}
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 {lead.origem || lead.source || "Desconhecido"}
               </p>
 
@@ -290,7 +290,7 @@ export function LeadDetailSheet({ leadId, open, onClose }) {
                 <TierBadge tier={lead.lead_tier} />
                 <BantDots lead={lead} />
                 {currentStageLabel && (
-                  <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-medium text-slate-300">
+                  <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-medium text-foreground">
                     {currentStageLabel}
                   </span>
                 )}
@@ -301,7 +301,7 @@ export function LeadDetailSheet({ leadId, open, onClose }) {
 
             {/* ===== Section 2: Timeline + Add Note ===== */}
             <div className="px-4">
-              <h3 className="mb-2 text-sm font-medium text-slate-300">
+              <h3 className="mb-2 text-sm font-medium text-foreground">
                 Timeline
               </h3>
 
@@ -343,7 +343,7 @@ export function LeadDetailSheet({ leadId, open, onClose }) {
 
             {/* ===== Section 3: Editable Fields ===== */}
             <div className="flex flex-col gap-1 px-4">
-              <h3 className="mb-1 text-sm font-medium text-slate-300">
+              <h3 className="mb-1 text-sm font-medium text-foreground">
                 Dados do Lead
               </h3>
               {EDITABLE_FIELDS.map(({ key, label }) => (
@@ -360,7 +360,7 @@ export function LeadDetailSheet({ leadId, open, onClose }) {
 
             {/* ===== Section 4: Quick Actions ===== */}
             <div className="flex flex-col gap-2 px-4 pb-4">
-              <h3 className="mb-1 text-sm font-medium text-slate-300">
+              <h3 className="mb-1 text-sm font-medium text-foreground">
                 Acoes
               </h3>
 
@@ -417,7 +417,7 @@ export function LeadDetailSheet({ leadId, open, onClose }) {
             </div>
           </>
         ) : (
-          <div className="flex items-center justify-center p-8 text-slate-500">
+          <div className="flex items-center justify-center p-8 text-muted-foreground">
             Lead nao encontrado
           </div>
         )}

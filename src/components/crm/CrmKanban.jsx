@@ -31,11 +31,11 @@ import { LeadDetailSheet } from "./LeadDetailSheet";
 
 // --- Column configuration ---
 const COLUMNS = [
-  { id: "novo", title: "Lead", color: "bg-slate-800" },
-  { id: "call_agendada", title: "Call Agendada", color: "bg-blue-950" },
-  { id: "proposta", title: "Proposta", color: "bg-amber-950" },
-  { id: "onboarding", title: "Onboarding", color: "bg-emerald-950" },
-  { id: "ativo", title: "Ativo", color: "bg-green-950" },
+  { id: "novo", title: "Lead", color: "bg-slate-200 dark:bg-slate-800" },
+  { id: "call_agendada", title: "Call Agendada", color: "bg-blue-100 dark:bg-blue-950" },
+  { id: "proposta", title: "Proposta", color: "bg-amber-100 dark:bg-amber-950" },
+  { id: "onboarding", title: "Onboarding", color: "bg-emerald-100 dark:bg-emerald-950" },
+  { id: "ativo", title: "Ativo", color: "bg-green-100 dark:bg-green-950" },
 ];
 
 const TIER_OPTIONS = ["hot", "warm", "cold"];
@@ -163,14 +163,14 @@ export function CrmKanban() {
     <div className="flex h-full flex-col gap-3">
       {/* Filter bar */}
       <div className="flex items-center gap-2">
-        <Filter className="h-4 w-4 text-slate-500" />
+        <Filter className="h-4 w-4 text-muted-foreground" />
 
         {/* Tier filter */}
         <DropdownMenu>
           <DropdownMenuTrigger
             className={cn(
-              "rounded-md border border-white/10 px-3 py-1.5 text-xs font-medium text-slate-300 transition-colors hover:bg-white/5",
-              tierFilter && "border-white/25 bg-white/5"
+              "rounded-md border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted",
+              tierFilter && "border-primary/30 bg-muted"
             )}
           >
             {tierFilter
@@ -195,8 +195,8 @@ export function CrmKanban() {
         <DropdownMenu>
           <DropdownMenuTrigger
             className={cn(
-              "rounded-md border border-white/10 px-3 py-1.5 text-xs font-medium text-slate-300 transition-colors hover:bg-white/5",
-              origemFilter && "border-white/25 bg-white/5"
+              "rounded-md border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted",
+              origemFilter && "border-primary/30 bg-muted"
             )}
           >
             {origemFilter || "Origem"}
@@ -223,7 +223,7 @@ export function CrmKanban() {
               setTierFilter(null);
               setOrigemFilter(null);
             }}
-            className="flex items-center gap-1 rounded-md px-2 py-1.5 text-xs text-slate-400 transition-colors hover:text-slate-200"
+            className="flex items-center gap-1 rounded-md px-2 py-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
           >
             <X className="h-3 w-3" />
             Limpar

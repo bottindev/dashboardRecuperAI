@@ -27,13 +27,13 @@ export function KanbanColumn({ column, leads, onSelectLead, highlightedLeadId })
       {/* Header with count */}
       <div
         className={cn(
-          "flex items-center justify-between rounded-t-lg border-b-2 border-transparent px-4 py-3 text-sm font-semibold text-slate-200",
+          "flex items-center justify-between rounded-t-lg border-b-2 border-transparent px-4 py-3 text-sm font-semibold text-card-foreground",
           column.color
         )}
       >
         <div className="flex items-center gap-2">
           <span>{column.title}</span>
-          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/10 text-xs font-normal">
+          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-foreground/10 text-xs font-normal">
             {leads.length}
           </span>
         </div>
@@ -46,8 +46,8 @@ export function KanbanColumn({ column, leads, onSelectLead, highlightedLeadId })
           setDroppableRef(node);
         }}
         className={cn(
-          "flex flex-1 flex-col gap-2 rounded-b-lg border border-white/5 bg-black/20 p-2 min-h-[500px] transition-colors",
-          isOver && "bg-white/5 border-white/15"
+          "flex flex-1 flex-col gap-2 rounded-b-lg border border-border bg-muted/30 p-2 min-h-[500px] transition-colors",
+          isOver && "bg-muted/50 border-primary/30"
         )}
       >
         <SortableContext
