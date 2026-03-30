@@ -12,6 +12,7 @@ import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { toast } from "sonner";
 import { Filter, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { usePipelineData } from "@/hooks/queries/usePipelineData";
 import { useMovePipelineLead } from "@/hooks/mutations/useMovePipelineLead";
 import {
@@ -39,7 +40,7 @@ const COLUMNS = [
 const TIER_OPTIONS = ["hot", "warm", "cold"];
 
 export function CrmKanban() {
-  const { data: leads = [], isPending } = usePipelineData();
+  const { data: leads = [], isPending, isError, refetch } = usePipelineData();
   const moveLead = useMovePipelineLead();
 
   const [activeLead, setActiveLead] = useState(null);
@@ -153,6 +154,10 @@ export function CrmKanban() {
     return (
       <div className="animate-pulse text-slate-400">Carregando CRM...</div>
     );
+  }
+
+  if (isError) {
+    return <ErrorState message="Erro ao carregar dados." onRetry={refetch} />;
   }
 
   return (
