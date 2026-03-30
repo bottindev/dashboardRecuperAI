@@ -7,7 +7,7 @@ import { useUpdateClient } from "@/hooks/mutations/useUpdateClient";
 import { updateClient } from "@/services/supabaseService";
 import { ClientTable } from "@/components/clients/ClientTable";
 import { ClientFormDialog } from "@/components/clients/ClientFormDialog";
-import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
+import { ClientsTableSkeleton } from "@/components/shared/ClientsTableSkeleton";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { toast } from "sonner";
@@ -72,7 +72,7 @@ export default function ClientesPage() {
     }
   };
 
-  if (isPending) return <LoadingSkeleton />;
+  if (isPending) return <ClientsTableSkeleton />;
   if (isError) return <ErrorState message={error?.message} onRetry={refetch} />;
 
   return (

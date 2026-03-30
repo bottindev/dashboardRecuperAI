@@ -152,6 +152,12 @@
   min-height: 100vh;
 }
 
+/* Shimmer animation for skeleton loading */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
 /* Dashboard animations */
 @keyframes fadeInUp {
   from {

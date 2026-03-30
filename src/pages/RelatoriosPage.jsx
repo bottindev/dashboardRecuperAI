@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useReportData } from "@/hooks/queries/useReportData";
 import { MonthPicker } from "@/components/shared/MonthPicker";
 import { ReportContent } from "@/components/reports/ReportContent";
-import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
+import { ReportSkeleton } from "@/components/shared/ReportSkeleton";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { toast } from "sonner";
@@ -50,7 +50,7 @@ export default function RelatoriosPage() {
     }
   };
 
-  if (isPending) return <LoadingSkeleton />;
+  if (isPending) return <ReportSkeleton />;
   if (isError) return <ErrorState message={error?.message} onRetry={refetch} />;
 
   return (

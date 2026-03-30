@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useClientOverview } from "@/hooks/queries/useClientOverview";
-import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
+import { ClientDetailSkeleton } from "@/components/shared/ClientDetailSkeleton";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { ClientHeader } from "@/components/client-detail/ClientHeader";
 import { TabOverview } from "@/components/client-detail/TabOverview";
@@ -18,7 +18,7 @@ export default function ClientDetailPage() {
     useClientOverview(id);
   const [activeTab, setActiveTab] = useState("overview");
 
-  if (isPending) return <LoadingSkeleton />;
+  if (isPending) return <ClientDetailSkeleton />;
   if (isError) return <ErrorState message={error?.message} onRetry={refetch} />;
 
   if (!client) {

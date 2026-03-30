@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { Filter, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { KanbanSkeleton } from "@/components/shared/KanbanSkeleton";
 import { usePipelineData } from "@/hooks/queries/usePipelineData";
 import { useMovePipelineLead } from "@/hooks/mutations/useMovePipelineLead";
 import {
@@ -151,9 +152,7 @@ export function CrmKanban() {
   }
 
   if (isPending && leads.length === 0) {
-    return (
-      <div className="animate-pulse text-slate-400">Carregando CRM...</div>
-    );
+    return <KanbanSkeleton />;
   }
 
   if (isError) {
