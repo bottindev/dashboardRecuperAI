@@ -27,7 +27,7 @@ export function KpiCard({
 
   return (
     <div
-      className="group rounded-xl border border-border bg-card p-5 shadow-sm transition-shadow hover:shadow-md"
+      className="group rounded-xl border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md"
       style={style}
     >
       {/* Header */}

@@ -128,7 +128,7 @@ export default function ConfiguracoesPage() {
 
       {/* Integration status */}
       <div>
-        <h3 className="mb-3 text-sm font-medium text-foreground">Integracoes</h3>
+        <h3 className="mb-3 text-sm font-semibold text-foreground">Integracoes</h3>
         <div className="grid gap-3 sm:grid-cols-2">
           {INTEGRATIONS.map((integration) => {
             const Icon = integration.icon;

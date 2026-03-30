@@ -17,8 +17,8 @@ export function CompanyTrendChart({ data }) {
   }));
 
   return (
-    <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-      <h3 className="mb-4 text-sm font-medium text-foreground">
+    <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+      <h3 className="mb-4 text-sm font-semibold text-foreground">
         Receita Mensal
       </h3>
       <div className="h-64">

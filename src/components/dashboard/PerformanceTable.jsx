@@ -61,7 +61,7 @@ export function PerformanceTable({ metrics, clients }) {
 
   return (
     <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
-      <div className="border-b border-border px-5 py-4">
+      <div className="border-b border-border px-4 py-4">
         <h3 className="text-sm font-semibold text-foreground">
           Performance por Cliente
           {latestMonth && (

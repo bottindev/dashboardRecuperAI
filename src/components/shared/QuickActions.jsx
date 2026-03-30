@@ -52,7 +52,7 @@ export function QuickActions() {
   };
 
   return (
-    <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+    <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
       <h3 className="mb-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
         Acoes Rapidas
       </h3>

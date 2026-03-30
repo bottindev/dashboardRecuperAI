@@ -8,7 +8,7 @@ export function LoadingSkeleton() {
         {Array.from({ length: 6 }).map((_, i) => (
           <div
             key={i}
-            className="rounded-xl border border-border bg-card p-5"
+            className="rounded-xl border border-border bg-card p-4"
           >
             <div className="flex items-center justify-between">
               <Skeleton className="h-3 w-24" />
@@ -29,7 +29,7 @@ export function LoadingSkeleton() {
         {[0, 1].map((i) => (
           <div
             key={i}
-            className="rounded-xl border border-border bg-card p-5"
+            className="rounded-xl border border-border bg-card p-4"
           >
             <Skeleton className="mb-4 h-4 w-40" />
             <Skeleton className="h-56 w-full rounded-lg" />
@@ -39,13 +39,13 @@ export function LoadingSkeleton() {
 
       {/* Table skeleton */}
       <div className="rounded-xl border border-border bg-card overflow-hidden">
-        <div className="border-b border-border p-5">
+        <div className="border-b border-border p-4">
           <Skeleton className="h-4 w-52" />
         </div>
         {Array.from({ length: 4 }).map((_, i) => (
           <div
             key={i}
-            className="flex gap-5 border-b border-border/5 px-5 py-4"
+            className="flex gap-4 border-b border-border/5 px-4 py-4"
           >
             <Skeleton className="h-3.5 w-[15%]" />
             <Skeleton className="h-3.5 w-[10%]" />
