@@ -1,3 +1,4 @@
+import { BarChart3 } from "lucide-react";
 import { PieChart, Pie, Cell, Label } from "recharts";
 import {
   ChartContainer,
@@ -7,6 +8,7 @@ import {
   ChartLegendContent,
 } from "@/components/ui/chart";
 import { fmtInt } from "@/utils/formatters";
+import { EmptyState } from "@/components/shared/EmptyState";
 
 const chartConfig = {
   convertidos: { label: "Convertidos", color: "#10B981" },
@@ -17,6 +19,17 @@ const chartConfig = {
 const CHART_COLORS = ["#10B981", "#EF4444", "#9CA3AF"];
 
 export function ConversionPieChart({ totals }) {
+  if (!totals || totals.totalConversations === 0) {
+    return (
+      <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+        <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-text-muted">
+          Distribuicao de Conversas
+        </h3>
+        <EmptyState icon={BarChart3} message="Sem dados para o periodo." className="py-8" />
+      </div>
+    );
+  }
+
   const others =
     totals.totalConversations - totals.totalConverted - totals.totalCancelled;
 
@@ -27,8 +40,8 @@ export function ConversionPieChart({ totals }) {
   ].filter((d) => d.value > 0);
 
   return (
-    <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-      <h3 className="mb-4 text-xs font-medium uppercase tracking-wider text-text-muted">
+    <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+      <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-text-muted">
         Distribuicao de Conversas
       </h3>
       <ChartContainer config={chartConfig} className="mx-auto h-64 w-full max-w-xs">

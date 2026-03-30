@@ -1,8 +1,12 @@
+import { Link } from "react-router-dom";
+import { Users, BarChart3 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useCeoOverview } from "@/hooks/queries/useCeoOverview";
 import { useCeoTrend } from "@/hooks/queries/useCeoTrend";
 import { useClientPerformance } from "@/hooks/queries/useClientPerformance";
 import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { CeoHeader } from "@/components/home/CeoHeader";
 import { CompanyKpiGrid } from "@/components/home/CompanyKpiGrid";
 import { CompanyTrendChart } from "@/components/home/CompanyTrendChart";
@@ -59,13 +63,19 @@ export default function HomePage() {
 
       <CompanyKpiGrid overview={overview} trendData={trendData} />
 
-      {trendData.length > 0 && <CompanyTrendChart data={trendData} />}
+      {trendData.length > 0 ? (
+        <CompanyTrendChart data={trendData} />
+      ) : (
+        <div className="rounded-xl border border-border bg-card shadow-sm">
+          <EmptyState icon={BarChart3} message="Dados insuficientes para grafico." className="py-8" />
+        </div>
+      )}
 
-      {clients.length > 0 && (
-        <section>
-          <h3 className="mb-3 text-sm font-medium text-foreground">
-            Clientes
-          </h3>
+      <section>
+        <h3 className="mb-3 text-sm font-semibold text-foreground">
+          Clientes
+        </h3>
+        {clients.length > 0 ? (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {clients.map((client) => (
               <ClientOverviewCard
@@ -74,8 +84,18 @@ export default function HomePage() {
               />
             ))}
           </div>
-        </section>
-      )}
+        ) : (
+          <EmptyState
+            icon={Users}
+            message="Nenhum cliente cadastrado."
+            action={
+              <Button asChild>
+                <Link to="/clientes">Novo Cliente</Link>
+              </Button>
+            }
+          />
+        )}
+      </section>
     </div>
   );
 }

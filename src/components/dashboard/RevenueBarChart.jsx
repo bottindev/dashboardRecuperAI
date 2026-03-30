@@ -1,3 +1,4 @@
+import { BarChart3 } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -10,6 +11,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { EmptyState } from "@/components/shared/EmptyState";
 
 const chartConfig = {
   receita: { label: "Receita", color: "#0EA5E9" },
@@ -17,9 +19,20 @@ const chartConfig = {
 };
 
 export function RevenueBarChart({ data }) {
+  if (!data || data.length === 0) {
+    return (
+      <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+        <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-text-muted">
+          Receita vs Investimento
+        </h3>
+        <EmptyState icon={BarChart3} message="Sem dados para o periodo." className="py-8" />
+      </div>
+    );
+  }
+
   return (
-    <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-      <h3 className="mb-4 text-xs font-medium uppercase tracking-wider text-text-muted">
+    <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+      <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-text-muted">
         Receita vs Investimento
       </h3>
       <ChartContainer config={chartConfig} className="h-64 w-full">

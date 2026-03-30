@@ -1,11 +1,12 @@
 import { useState, useMemo } from "react";
-import { Printer, FileSpreadsheet } from "lucide-react";
+import { Printer, FileSpreadsheet, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useReportData } from "@/hooks/queries/useReportData";
 import { MonthPicker } from "@/components/shared/MonthPicker";
 import { ReportContent } from "@/components/reports/ReportContent";
 import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { toast } from "sonner";
 
 const MONTHS_PT = [
@@ -84,8 +85,8 @@ export default function RelatoriosPage() {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="rounded-xl border border-border bg-card p-10 text-center text-sm text-muted-foreground">
-          Nenhum dado encontrado para {monthLabel}.
+        <div className="rounded-xl border border-border bg-card shadow-sm">
+          <EmptyState icon={FileText} message="Nenhum dado encontrado para o periodo." />
         </div>
       ) : (
         <ReportContent

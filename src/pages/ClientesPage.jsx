@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useClientsAdmin } from "@/hooks/queries/useClientsAdmin";
 import { useCreateClient } from "@/hooks/mutations/useCreateClient";
@@ -9,6 +9,7 @@ import { ClientTable } from "@/components/clients/ClientTable";
 import { ClientFormDialog } from "@/components/clients/ClientFormDialog";
 import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -89,11 +90,24 @@ export default function ClientesPage() {
         </Button>
       </div>
 
-      <ClientTable
-        clients={clients}
-        onEdit={handleEdit}
-        onDeactivate={handleDeactivate}
-      />
+      {clients.length > 0 ? (
+        <ClientTable
+          clients={clients}
+          onEdit={handleEdit}
+          onDeactivate={handleDeactivate}
+        />
+      ) : (
+        <EmptyState
+          icon={Users}
+          message="Nenhum cliente cadastrado."
+          action={
+            <Button onClick={handleCreate}>
+              <Plus className="mr-1.5 h-4 w-4" />
+              Novo Cliente
+            </Button>
+          }
+        />
+      )}
 
       <ClientFormDialog
         open={dialogOpen}

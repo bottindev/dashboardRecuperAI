@@ -8,9 +8,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, Users } from "lucide-react";
 import { fmt, fmtInt, fmtMonth } from "@/utils/formatters";
 import { cn } from "@/lib/utils";
+import { EmptyState } from "@/components/shared/EmptyState";
 
 const COLUMNS = [
   { key: "name", label: "Cliente", align: "left" },
@@ -72,9 +73,7 @@ export function PerformanceTable({ metrics, clients }) {
       </div>
 
       {rows.length === 0 ? (
-        <div className="px-5 py-10 text-center text-sm text-text-muted">
-          Nenhum dado disponivel para o periodo selecionado.
-        </div>
+        <EmptyState icon={Users} message="Nenhum cliente encontrado." />
       ) : (
         <div className="overflow-x-auto">
           <Table>

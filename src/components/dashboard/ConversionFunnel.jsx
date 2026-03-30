@@ -1,5 +1,7 @@
+import { BarChart3 } from "lucide-react";
 import { fmtInt } from "@/utils/formatters";
 import { cn } from "@/lib/utils";
+import { EmptyState } from "@/components/shared/EmptyState";
 
 const steps = [
   { key: "total", label: "Total Atendimentos", color: "bg-sky" },
@@ -8,6 +10,17 @@ const steps = [
 ];
 
 export function ConversionFunnel({ totals }) {
+  if (!totals || totals.totalConversations === 0) {
+    return (
+      <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+        <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-text-muted">
+          Funil de Conversao
+        </h3>
+        <EmptyState icon={BarChart3} message="Sem dados para o periodo." className="py-8" />
+      </div>
+    );
+  }
+
   const data = [
     { ...steps[0], value: totals.totalConversations },
     {
@@ -20,8 +33,8 @@ export function ConversionFunnel({ totals }) {
   const max = Math.max(...data.map((d) => d.value), 1);
 
   return (
-    <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-      <h3 className="mb-4 text-xs font-medium uppercase tracking-wider text-text-muted">
+    <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+      <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-text-muted">
         Funil de Conversao
       </h3>
       <div className="space-y-3 py-4">

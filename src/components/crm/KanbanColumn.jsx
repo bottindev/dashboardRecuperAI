@@ -54,14 +54,20 @@ export function KanbanColumn({ column, leads, onSelectLead, highlightedLeadId })
           items={leads.map((l) => l.id)}
           strategy={verticalListSortingStrategy}
         >
-          {leads.map((lead) => (
-            <KanbanCard
-              key={lead.id}
-              lead={lead}
-              onSelect={onSelectLead}
-              highlighted={lead.id === highlightedLeadId}
-            />
-          ))}
+          {leads.length === 0 ? (
+            <p className="py-8 text-center text-xs text-muted-foreground opacity-60">
+              Nenhum lead neste estagio
+            </p>
+          ) : (
+            leads.map((lead) => (
+              <KanbanCard
+                key={lead.id}
+                lead={lead}
+                onSelect={onSelectLead}
+                highlighted={lead.id === highlightedLeadId}
+              />
+            ))
+          )}
         </SortableContext>
       </div>
     </div>

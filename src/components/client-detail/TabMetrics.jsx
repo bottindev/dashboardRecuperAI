@@ -7,6 +7,7 @@ import { RevenueBarChart } from "@/components/dashboard/RevenueBarChart";
 import { ConversionPieChart } from "@/components/dashboard/ConversionPieChart";
 import { ConversionFunnel } from "@/components/dashboard/ConversionFunnel";
 import { RoiSummary } from "@/components/dashboard/RoiSummary";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
 
 function MetricsSkeleton() {
@@ -41,12 +42,7 @@ export function TabMetrics({ clientId }) {
   if (isPending) return <MetricsSkeleton />;
 
   if (!metrics || metrics.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 text-center text-muted-foreground">
-        <BarChart3 className="h-10 w-10 mb-3 opacity-40" />
-        <p className="text-sm">Sem dados de metricas para este cliente</p>
-      </div>
-    );
+    return <EmptyState icon={BarChart3} message="Nenhuma metrica disponivel." />;
   }
 
   return (

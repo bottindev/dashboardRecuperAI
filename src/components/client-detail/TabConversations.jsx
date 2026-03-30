@@ -2,6 +2,7 @@ import { MessageSquare, Clock } from "lucide-react";
 import { useClientConversations } from "@/hooks/queries/useClientConversations";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { formatRelativeTime } from "@/utils/formatters";
 
 const OUTCOME_CONFIG = {
@@ -69,12 +70,7 @@ export function TabConversations({ clientId }) {
   if (isPending) return <ConversationsSkeleton />;
 
   if (!conversations || conversations.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 text-center text-muted-foreground">
-        <MessageSquare className="h-10 w-10 mb-3 opacity-40" />
-        <p className="text-sm">Nenhuma conversa encontrada</p>
-      </div>
-    );
+    return <EmptyState icon={MessageSquare} message="Nenhuma conversa registrada." />;
   }
 
   return (
