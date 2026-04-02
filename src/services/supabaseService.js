@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabaseClient";
+import { supabaseHQ } from "@/lib/supabaseHQ";
 
 export async function fetchClients() {
   const { data, error } = await supabase
@@ -64,7 +65,7 @@ export async function triggerReport(clientId) {
 }
 
 export async function fetchCeoOverview() {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseHQ
     .from("ceo_overview")
     .select("*")
     .single();

@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/lib/supabaseClient";
+import { supabaseHQ as supabase } from "@/lib/supabaseHQ";
 import { queryKeys } from "../queryKeys";
 
 async function updateLead({ leadId, updates }) {

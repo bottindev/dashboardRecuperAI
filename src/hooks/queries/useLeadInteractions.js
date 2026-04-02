@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/lib/supabaseClient";
+import { supabaseHQ as supabase } from "@/lib/supabaseHQ";
 import { queryKeys } from "../queryKeys";
 
 const THIRTY_SECONDS = 30 * 1000;
