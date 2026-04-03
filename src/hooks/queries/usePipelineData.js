@@ -5,7 +5,7 @@ import { queryKeys } from "../queryKeys";
 
 const THIRTY_SECONDS = 30 * 1000;
 
-const ACTIVE_ETAPAS = ["novo", "call_agendada", "proposta", "onboarding", "ativo"];
+const ACTIVE_ETAPAS = ["novo", "qualificado_hot", "call_agendada", "proposta", "onboarding", "ativo"];
 
 async function fetchPipelineLeads() {
   const { data, error } = await supabase

@@ -32,6 +32,7 @@ import { LeadDetailSheet } from "./LeadDetailSheet";
 // --- Column configuration ---
 const COLUMNS = [
   { id: "novo", title: "Lead", color: "bg-slate-200 dark:bg-slate-800" },
+  { id: "qualificado_hot", title: "Qualificado", color: "bg-orange-100 dark:bg-orange-950" },
   { id: "call_agendada", title: "Call Agendada", color: "bg-blue-100 dark:bg-blue-950" },
   { id: "proposta", title: "Proposta", color: "bg-amber-100 dark:bg-amber-950" },
   { id: "onboarding", title: "Onboarding", color: "bg-emerald-100 dark:bg-emerald-950" },
