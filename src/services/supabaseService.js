@@ -22,19 +22,53 @@ export async function fetchMetrics() {
 export async function fetchClientsFull() {
   const { data, error } = await supabase
     .from("config_clientes")
-    .select("id,nome_negocio,status,investimento_mensal,whatsapp_relatorio")
+    .select("id,nome_negocio,segment,status,investimento_mensal,whatsapp_relatorio")
     .order("nome_negocio");
   if (error) throw new Error(`Supabase error: ${error.message}`);
   return data;
 }
 
 export async function createClient(clientData) {
+  const { valor_setup, data_inicio, ...clientFields } = clientData;
+
+  // Set required defaults for config_clientes NOT NULL fields
+  const insertData = {
+    client_id: crypto.randomUUID(),
+    nome_agente: clientFields.nome_negocio,
+    cidade: "",
+    instrucoes_tom_voz: "",
+    google_calendar_id: "",
+    evolution_instance: "",
+    ...clientFields,
+  };
+
   const { data, error } = await supabase
     .from("config_clientes")
-    .insert(clientData)
+    .insert(insertData)
     .select()
     .single();
   if (error) throw new Error(`Supabase error: ${error.message}`);
+
+  // Create contract if setup or mensalidade provided
+  if (valor_setup || clientFields.investimento_mensal) {
+    await createContract({
+      config_cliente_id: data.id,
+      valor_setup: valor_setup || 0,
+      valor_mensalidade: clientFields.investimento_mensal || 0,
+      data_inicio: data_inicio || new Date().toISOString().slice(0, 10),
+    });
+  }
+
+  return data;
+}
+
+export async function createContract(contractData) {
+  const { data, error } = await supabase
+    .from("recuperai_contratos")
+    .insert({ ...contractData, status: "ativo" })
+    .select()
+    .single();
+  if (error) throw new Error(`Contrato error: ${error.message}`);
   return data;
 }
 
